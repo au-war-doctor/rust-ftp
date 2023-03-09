@@ -1,5 +1,10 @@
-use std::net::TcpListener;
+use std::net::{TcpListener, TcpStream};
 use std::io::Write;
+use std::thread;
+
+fn handle_client(mut stream: TcpStream) {
+    println!("new client connected!");
+}
 
 fn main() {
 
@@ -11,10 +16,10 @@ fn main() {
     // 'incoming' returns an iterator over the received connections
     for stream in listener.incoming() {
         match stream {
-            Ok(mut stream) => {
-                if let Err(_) = stream.write(b"hello world") {
-                    println!("Failed to write hello to stream");
-                }
+            Ok(stream) => {
+                thread::spawn(move ||{
+                    handle_client(stream);
+                });
             }
             Err(_) => {
                 println!("This stream's connection has failed");
