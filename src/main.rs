@@ -2,8 +2,35 @@ use std::fmt::format;
 use std::net::{TcpListener, TcpStream};
 use std::io::Write;
 use std::thread;
+use std::io;
+use std::str;
+
+#[derive(Clone, Debug)]
+enum Command {
+    Auth,
+    Unknown(String),
+}
 
 
+impl AsRef<str> for Command {
+    fn as_ref(&self) -> &str {
+        match *self {
+            Command::Auth => "AUTH",
+            Command::Unknown(_) => "UNKN",
+        }
+    }
+}
+
+impl Command {
+    pub fn new(input: Vec<u8>) -> io::Result<Self> {
+        return Ok(Command::Auth)
+    }
+}
+
+
+#[allow(dead_code)]
+#[repr(u32)]
+#[derive(Debug, Clone, Copy)]
 enum ResultCode {
     RestartMarkerReply = 110,
     ServiceReadInXXXMinutes = 120,
@@ -53,7 +80,8 @@ fn handle_client(mut stream: TcpStream) {
 
 
 fn send_cmd(stream: &mut TcpStream, code: ResultCode, message: &str) {
-    let msg = if message.is_empty() {
+    let msg = if message.is_empty() { 
+        //CommandNotImplemented = 502,
         format!("{}\r\n", code as u32)
     } else {
         format!("{} {}\r\n", code as u32, message)
