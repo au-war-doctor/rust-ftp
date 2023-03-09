@@ -58,6 +58,8 @@ fn send_cmd(stream: &mut TcpStream, code: ResultCode, message: &str) {
     } else {
         format!("{} {}\r\n", code as u32, message)
     };
+    println!("<==== {}", msg);
+    write!(stream, "{}", msg).unwrap(); //could use ? and re-raise if this returned an optional
 }
 
 
